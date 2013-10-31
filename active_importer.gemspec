@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = ActiveImporter::VERSION
   spec.authors       = ["Ernesto Garcia"]
   spec.email         = ["gnapse@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Import tabular data from spreadsheets or similar sources into data models}
+  spec.summary       = %q{Import tabular data into data models}
   spec.homepage      = ""
   spec.license       = "MIT"
 
