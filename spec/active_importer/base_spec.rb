@@ -59,4 +59,12 @@ describe ActiveImporter::Base do
       expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(1)
     end
   end
+
+  describe '.hook' do
+    it 'allows the importer to modify the model for each row' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      expect(importer).to receive(:hook).twice
+      EmployeeImporter.import('/dummy/file')
+    end
+  end
 end
