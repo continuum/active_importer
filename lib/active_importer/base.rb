@@ -50,18 +50,25 @@ module ActiveImporter
     def import
       @data_row_indices.each do |index|
         @row = row_to_hash @book.row(index)
-        fetch_model
-        build_model
-        model.save!
-        # rescue => e
-        #   handle_row_error(e)
+        import_row
       end
     end
 
     def hook
     end
 
+    def row_error(error_message)
+    end
+
     private
+
+    def import_row
+      fetch_model
+      build_model
+      model.save!
+    rescue => e
+      row_error(e.message)
+    end
 
     def build_model
       row.each_pair do |key, value|
