@@ -34,13 +34,15 @@ module ActiveImporter
     #
 
     attr_reader :header, :row, :model
-    attr_reader :row_count
+    attr_reader :row_count, :row_index
+    attr_reader :row_errors
 
     def initialize(file, options = {})
       @book = Roo::Spreadsheet.new(file, options)
       @header = @book.row(1)
       @data_row_indices = (2..@book.count)
       @row_count = @data_row_indices.count
+      @row_errors = []
     end
 
     def fetch_model
@@ -49,10 +51,19 @@ module ActiveImporter
 
     def import
       @data_row_indices.each do |index|
+        @row_index = index
         @row = row_to_hash @book.row(index)
         import_row
       end
       import_finished
+    end
+
+    def row_success_count
+      row_index - row_errors.count - 1
+    end
+
+    def row_error_count
+      row_errors.count
     end
 
     def hook
@@ -75,6 +86,7 @@ module ActiveImporter
       model.save!
       row_success
     rescue => e
+      @row_errors << { row_index: row_index, error_message: e.message }
       row_error(e.message)
     end
 

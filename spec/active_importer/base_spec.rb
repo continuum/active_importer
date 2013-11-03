@@ -54,6 +54,11 @@ describe ActiveImporter::Base do
       expect(importer).to receive(:row_success).twice
       EmployeeImporter.import('/dummy/file')
     end
+
+    it 'keeps track of each error' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      expect { EmployeeImporter.import('/dummy/file') }.to change(importer.row_errors, :count).by(2)
+    end
   end
 
   describe '.fetch_model' do
