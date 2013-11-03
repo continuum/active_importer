@@ -10,9 +10,21 @@ describe ActiveImporter::Base do
     ]
   end
 
-  it 'imports all data from the spreadsheet into the model' do
+  let(:importer) { EmployeeImporter.new('/dummy/file') }
+
+  before do
     expect(Roo::Spreadsheet).to receive(:new).and_return { Spreadsheet.new(spreadsheet_data) }
+  end
+
+  it 'imports all data from the spreadsheet into the model' do
     expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
+  end
+
+  it 'notifies when each row has been imported successfully' do
+    expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+    expect(importer).not_to receive(:row_error)
+    expect(importer).to receive(:row_success).twice
+    EmployeeImporter.import('/dummy/file')
   end
 
   context 'when there are rows with errors' do
@@ -26,18 +38,14 @@ describe ActiveImporter::Base do
       ]
     end
 
-    before do
-      expect(Roo::Spreadsheet).to receive(:new).and_return { Spreadsheet.new(spreadsheet_data) }
-    end
-
     it 'does not import those rows' do
       expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
     end
 
     it 'notifies about each error' do
-      importer = EmployeeImporter.new('/dummy/file')
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
       expect(importer).to receive(:row_error).twice
+      expect(importer).to receive(:row_success).twice
       EmployeeImporter.import('/dummy/file')
     end
   end

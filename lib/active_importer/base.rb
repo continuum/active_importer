@@ -57,6 +57,9 @@ module ActiveImporter
     def hook
     end
 
+    def row_success
+    end
+
     def row_error(error_message)
     end
 
@@ -66,6 +69,7 @@ module ActiveImporter
       fetch_model
       build_model
       model.save!
+      row_success
     rescue => e
       row_error(e.message)
     end
