@@ -27,6 +27,12 @@ describe ActiveImporter::Base do
     EmployeeImporter.import('/dummy/file')
   end
 
+  it 'notifies when the import process has finished' do
+    expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+    expect(importer).to receive(:import_finished).once
+    EmployeeImporter.import('/dummy/file')
+  end
+
   context 'when there are rows with errors' do
     let(:spreadsheet_data) do
       [

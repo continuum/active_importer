@@ -52,6 +52,7 @@ module ActiveImporter
         @row = row_to_hash @book.row(index)
         import_row
       end
+      import_finished
     end
 
     def hook
@@ -61,6 +62,9 @@ module ActiveImporter
     end
 
     def row_error(error_message)
+    end
+
+    def import_finished
     end
 
     private
