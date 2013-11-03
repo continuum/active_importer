@@ -60,8 +60,12 @@ module ActiveImporter
       import_finished
     end
 
+    def row_processed_count
+      row_index - 1
+    end
+
     def row_success_count
-      row_index - row_errors.count - 1
+      row_processed_count - row_errors.count
     end
 
     def row_error_count
