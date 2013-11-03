@@ -49,4 +49,14 @@ describe ActiveImporter::Base do
       EmployeeImporter.import('/dummy/file')
     end
   end
+
+  describe '.fetch_model' do
+    let(:model) { Employee.new }
+
+    it 'controls what model instance is loaded for each given row' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      expect(importer).to receive(:fetch_model).twice.and_return(model)
+      expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(1)
+    end
+  end
 end

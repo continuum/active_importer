@@ -44,7 +44,7 @@ module ActiveImporter
     end
 
     def fetch_model
-      @model = @@model_class.new
+      @@model_class.new
     end
 
     def import
@@ -66,7 +66,7 @@ module ActiveImporter
     private
 
     def import_row
-      fetch_model
+      @model = fetch_model
       build_model
       model.save!
       row_success
