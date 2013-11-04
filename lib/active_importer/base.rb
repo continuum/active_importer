@@ -10,12 +10,20 @@ module ActiveImporter
     @@model_class = nil
     @@columns = {}
 
-    def self.imports(model_class)
-      @@model_class = model_class
+    def self.imports(klass)
+      @@model_class = klass
     end
 
     def self.columns
       @@columns
+    end
+
+    def self.model_class
+      @@model_class
+    end
+
+    def model_class
+      @@model_class
     end
 
     def self.column(title, field, &block)
