@@ -40,7 +40,7 @@ module ActiveImporter
 
     def initialize(file, options = {})
       @context = options.delete(:context)
-      @book = Roo::Spreadsheet.new(file, options)
+      @book = Roo::Spreadsheet.open(file, options)
       @header = @book.row(1)
       @data_row_indices = (2..@book.count)
       @row_count = @data_row_indices.count

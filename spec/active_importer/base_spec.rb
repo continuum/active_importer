@@ -13,7 +13,7 @@ describe ActiveImporter::Base do
   let(:importer) { EmployeeImporter.new('/dummy/file') }
 
   before do
-    expect(Roo::Spreadsheet).to receive(:new).and_return { Spreadsheet.new(spreadsheet_data) }
+    expect(Roo::Spreadsheet).to receive(:open).and_return { Spreadsheet.new(spreadsheet_data) }
   end
 
   it 'imports all data from the spreadsheet into the model' do
