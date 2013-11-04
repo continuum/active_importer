@@ -47,12 +47,20 @@ module ActiveImporter
     attr_reader :context
 
     def initialize(file, options = {})
+      @row_errors = []
       @context = options.delete(:context)
+
       @book = Roo::Spreadsheet.open(file, options)
       @header = @book.row(1)
+      check_header
+
       @data_row_indices = (2..@book.count)
       @row_count = @data_row_indices.count
-      @row_errors = []
+    rescue => e
+      @book = @header = nil
+      @row_count = 0
+      @row_index = 1
+      import_failed(e.message)
     end
 
     def fetch_model
@@ -60,6 +68,7 @@ module ActiveImporter
     end
 
     def import
+      return if @book.nil?
       @data_row_indices.each do |index|
         @row_index = index
         @row = row_to_hash @book.row(index)
@@ -89,10 +98,20 @@ module ActiveImporter
     def row_error(error_message)
     end
 
+    def import_failed(error_message)
+    end
+
     def import_finished
     end
 
     private
+
+    def check_header
+      # Header should contain all columns declared for this importer
+      unless @@columns.keys.all? { |item| @header.include?(item) }
+        raise 'Spreadsheet does not contain all the expected columns'
+      end
+    end
 
     def import_row
       @model = fetch_model

@@ -61,6 +61,21 @@ describe ActiveImporter::Base do
     end
   end
 
+  context 'when the import fails' do
+    let(:spreadsheet_data) do
+      [
+        ['Name', 'Birth Date'],
+        ['John Doe', '2013-10-25'],
+        ['Jane Doe', '2013-10-26'],
+      ]
+    end
+
+    it 'notifies the failure' do
+      expect_any_instance_of(EmployeeImporter).to receive(:import_failed)
+      EmployeeImporter.import('/dummy/file')
+    end
+  end
+
   describe '.fetch_model' do
     let(:model) { Employee.new }
 
