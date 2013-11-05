@@ -1,6 +1,6 @@
 # ActiveImporter
 
-TODO: Write a gem description
+Define importers that load tabular data from spreadsheets or CSV files into any ActiveRecord-like ORM.
 
 ## Installation
 
@@ -18,7 +18,28 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Define classes that you instruct on how to import data into data models.
+
+```ruby
+class EmployeeImporter < ActiveImporter::Base
+  imports Employee
+
+  column 'First name', :first_name
+  column 'Last name', :last_name
+  column 'Department', :department do |department_name|
+    Department.find_by(name: department_name)
+  end
+end
+```
+
+The importer defines what data model it imports data into, and how columns in
+the data source map to fields in the model.  Also, by providing a block, the
+source value can be processed before being stored, as shown with the
+'Department' column in the example above.
+
+### Callbacks
+
+TODO: Document callbacks
 
 ## Contributing
 
