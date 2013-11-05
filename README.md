@@ -37,6 +37,17 @@ the data source map to fields in the model.  Also, by providing a block, the
 source value can be processed before being stored, as shown with the
 'Department' column in the example above.
 
+Once defined, importers can be invoked to import a given data file.
+
+```ruby
+EmployeeImporter.import('/path/to/file.xls')
+```
+
+The data file is expected to contain columns with titles corresponding to the
+columns declared.  Any extra columns are ignored.  Any errors while processing
+the data file does not interrupt the whole process.  Instead, errors are
+notified via some callbacks defined in the importer (see below).
+
 ### Callbacks
 
 TODO: Document callbacks
