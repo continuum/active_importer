@@ -7,23 +7,23 @@ module ActiveImporter
     # DSL and class variables
     #
 
-    @@model_class = nil
-    @@columns = {}
+    @model_class = nil
+    @columns = {}
 
     def self.imports(klass)
-      @@model_class = klass
+      @model_class = klass
     end
 
     def self.columns
-      @@columns
+      @columns ||= {}
     end
 
     def self.model_class
-      @@model_class
+      @model_class
     end
 
     def model_class
-      @@model_class
+      self.class.model_class
     end
 
     def self.column(title, field, &block)
@@ -64,7 +64,7 @@ module ActiveImporter
     end
 
     def fetch_model
-      @@model_class.new
+      model_class.new
     end
 
     def import
@@ -106,9 +106,13 @@ module ActiveImporter
 
     private
 
+    def columns
+      self.class.columns
+    end
+
     def check_header
       # Header should contain all columns declared for this importer
-      unless @@columns.keys.all? { |item| @header.include?(item) }
+      unless columns.keys.all? { |item| @header.include?(item) }
         raise 'Spreadsheet does not contain all the expected columns'
       end
     end
@@ -125,7 +129,7 @@ module ActiveImporter
 
     def build_model
       row.each_pair do |key, value|
-        column_def = @@columns[key]
+        column_def = columns[key]
         next if column_def.nil?
         field_name = column_def[:field_name]
         transform = column_def[:transform]
