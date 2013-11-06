@@ -76,6 +76,23 @@ describe ActiveImporter::Base do
     end
   end
 
+  context 'when header row is not the first one' do
+    let(:spreadsheet_data) do
+      [
+        [],
+        ['List of employees', '', 'Company Name'],
+        ['Ordered by', 'Birth Date'],
+        ['Name', 'Department', 'Birth Date'],
+        ['John Doe', 'IT', '2013-10-25'],
+        ['Jane Doe', 'Sales', '2013-10-26'],
+      ]
+    end
+
+    it 'smartly skips any rows before the header' do
+      expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
+    end
+  end
+
   describe '.fetch_model' do
     let(:model) { Employee.new }
 

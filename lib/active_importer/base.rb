@@ -52,10 +52,9 @@ module ActiveImporter
       @context = options.delete(:context)
 
       @book = Roo::Spreadsheet.open(file, options)
-      @header = @book.row(1).map(&:strip)
-      check_header
+      load_header
 
-      @data_row_indices = (2..@book.last_row)
+      @data_row_indices = ((@header_index+1)..@book.last_row)
       @row_count = @data_row_indices.count
     rescue => e
       @book = @header = nil
@@ -111,9 +110,19 @@ module ActiveImporter
       self.class.columns
     end
 
-    def check_header
-      # Header should contain all columns declared for this importer
-      unless columns.keys.all? { |item| @header.include?(item) }
+    def find_header_index
+      (1..@book.last_row).each do |index|
+        row = @book.row(index).map(&:strip)
+        return index if columns.keys.all? { |item| row.include?(item) }
+      end
+      return nil
+    end
+
+    def load_header
+      @header_index = find_header_index
+      if @header_index
+        @header = @book.row(@header_index).map(&:strip)
+      else
         raise 'Spreadsheet does not contain all the expected columns'
       end
     end
