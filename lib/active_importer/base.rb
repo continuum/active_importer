@@ -27,6 +27,7 @@ module ActiveImporter
     end
 
     def self.column(title, field, &block)
+      title = title.strip
       if columns[title]
         raise "Duplicate importer column '#{title}'"
       end
@@ -51,7 +52,7 @@ module ActiveImporter
       @context = options.delete(:context)
 
       @book = Roo::Spreadsheet.open(file, options)
-      @header = @book.row(1)
+      @header = @book.row(1).map(&:strip)
       check_header
 
       @data_row_indices = (2..@book.count)

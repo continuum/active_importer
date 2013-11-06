@@ -14,7 +14,7 @@ class EmployeeImporter < ActiveImporter::Base
 
   column 'Name', :name
   column 'Birth Date', :birth_date
-  column 'Department', :department_id do |value|
+  column '  Department ', :department_id do |value|
     value.length # Quick dummy way to get an integer out of a string
   end
 end
