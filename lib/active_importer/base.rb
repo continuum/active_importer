@@ -55,7 +55,7 @@ module ActiveImporter
       @header = @book.row(1).map(&:strip)
       check_header
 
-      @data_row_indices = (2..@book.count)
+      @data_row_indices = (2..@book.last_row)
       @row_count = @data_row_indices.count
     rescue => e
       @book = @header = nil

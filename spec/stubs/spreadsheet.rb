@@ -3,7 +3,7 @@ class Spreadsheet
     @data = data
   end
 
-  def count
+  def last_row
     @data.count
   end
 
