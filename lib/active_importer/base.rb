@@ -128,13 +128,17 @@ module ActiveImporter
     end
 
     def import_row
-      @model = fetch_model
-      build_model
-      model.save!
+      begin
+        @model = fetch_model
+        build_model
+        model.save!
+      rescue => e
+        @row_errors << { row_index: row_index, error_message: e.message }
+        row_error(e.message)
+        return false
+      end
       row_success
-    rescue => e
-      @row_errors << { row_index: row_index, error_message: e.message }
-      row_error(e.message)
+      true
     end
 
     def build_model
