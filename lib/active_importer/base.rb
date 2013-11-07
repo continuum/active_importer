@@ -143,7 +143,7 @@ module ActiveImporter
         next if column_def.nil?
         field_name = column_def[:field_name]
         transform = column_def[:transform]
-        value = transform.call(value) if transform
+        value = self.instance_exec(value, &transform) if transform
         model[field_name] = value
       end
       hook
