@@ -48,6 +48,27 @@ columns declared.  Any extra columns are ignored.  Any errors while processing
 the data file does not interrupt the whole process.  Instead, errors are
 notified via some callbacks defined in the importer (see below).
 
+### Supported formats
+
+This library currently supports reading from most spreadsheet formats, thanks
+to the wonderfull [roo](https://github.com/Empact/roo) gem.  Specifically, the
+following formats are supported:
+
+* OpenOffice
+* Excel
+* Google spreadsheets
+* Excelx
+* LibreOffice
+* CSV
+
+The spreadsheet contents are scanned, row by row, until a row is found that
+matches the expect header column, which should contain header cells for all the
+columns declared in the importer.  If no such row is found, the spreadsheet
+processing fails without importing any data.
+
+If the header row is found, data is scanned from the next row on, until the end
+of the spreadsheet.
+
 ### Callbacks
 
 TODO: Document callbacks
