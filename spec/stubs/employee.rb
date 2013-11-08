@@ -22,4 +22,9 @@ class EmployeeImporter < ActiveImporter::Base
   def find_department(name)
     name.length # Quick dummy way to get an integer out of a string
   end
+
+  ActiveImporter::Base::EVENTS.each do |event_name|
+    define_method(event_name) {}
+    on(event_name) { send event_name }
+  end
 end
