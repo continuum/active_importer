@@ -9,7 +9,16 @@ class Employee < DataModel
   end
 end
 
-class EmployeeImporter < ActiveImporter::Base
+class EmployeeBaseImporter < ActiveImporter::Base
+  on(:import_finished) { base_import_finished }
+
+  private
+
+  def base_import_finished
+  end
+end
+
+class EmployeeImporter < EmployeeBaseImporter
   imports Employee
 
   column 'Name', :name

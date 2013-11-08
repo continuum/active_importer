@@ -61,12 +61,23 @@ module ActiveImporter
     end
 
     def fire_event(event, param = nil)
-      self.class.event_handlers[event].each do |block|
-        self.instance_exec(param, &block)
+      self.class.send(:fire_event, self, event, param)
+      unless self.class == ActiveImporter::Base
+        self.class.superclass.send(:fire_event, self, event, param)
+      end
+    end
+
+    def self.fire_event(instance, event, param = nil)
+      event_handlers[event].each do |block|
+        instance.instance_exec(param, &block)
       end
     end
 
     private :fire_event
+
+    class << self
+      private :fire_event
+    end
 
     #
     # Implementation

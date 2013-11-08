@@ -31,6 +31,7 @@ describe ActiveImporter::Base do
     expect(EmployeeImporter).to receive(:new).once.and_return(importer)
     expect(importer).to receive(:import_started).once
     expect(importer).to receive(:import_finished).once
+    expect(importer).to receive(:base_import_finished).once
     EmployeeImporter.import('/dummy/file')
   end
 
