@@ -14,6 +14,7 @@ class EmployeeImporter < ActiveImporter::Base
 
   column 'Name', :name
   column 'Birth Date', :birth_date
+  column 'Manager'
   column '  Department ', :department_id do |value|
     find_department(value)
   end

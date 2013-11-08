@@ -4,7 +4,7 @@ require 'stubs/employee'
 describe ActiveImporter::Base do
   let(:spreadsheet_data) do
     [
-      [' Name ', 'Birth Date', 'Department'],
+      [' Name ', 'Birth Date', 'Department', 'Manager'],
       ['John Doe', '2013-10-25', 'IT'],
       ['Jane Doe', '2013-10-26', 'Sales'],
     ]
@@ -36,7 +36,7 @@ describe ActiveImporter::Base do
   context 'when there are rows with errors' do
     let(:spreadsheet_data) do
       [
-        ['Name', 'Birth Date', 'Department'],
+        ['Name', 'Birth Date', 'Department', 'Manager'],
         ['John Doe', '2013-10-25', 'IT'],
         ['Invalid', '2013-10-24', 'Management'],
         ['Invalid', '2013-10-24', 'Accounting'],
@@ -64,7 +64,7 @@ describe ActiveImporter::Base do
   context 'when the import fails' do
     let(:spreadsheet_data) do
       [
-        ['Name', 'Birth Date'],
+        ['Name', 'Birth Date', 'Manager'],
         ['John Doe', '2013-10-25'],
         ['Jane Doe', '2013-10-26'],
       ]
@@ -82,7 +82,7 @@ describe ActiveImporter::Base do
         [],
         ['List of employees', '', 'Company Name'],
         ['Ordered by', 'Birth Date'],
-        ['Name', 'Department', 'Birth Date'],
+        ['Name', 'Department', 'Birth Date', 'Manager'],
         ['John Doe', 'IT', '2013-10-25'],
         ['Jane Doe', 'Sales', '2013-10-26'],
       ]

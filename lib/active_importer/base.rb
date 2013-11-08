@@ -26,7 +26,7 @@ module ActiveImporter
       self.class.model_class
     end
 
-    def self.column(title, field, &block)
+    def self.column(title, field = nil, &block)
       title = title.strip
       if columns[title]
         raise "Duplicate importer column '#{title}'"
@@ -144,7 +144,7 @@ module ActiveImporter
     def build_model
       row.each_pair do |key, value|
         column_def = columns[key]
-        next if column_def.nil?
+        next if column_def.nil? || column_def[:field_name].nil?
         field_name = column_def[:field_name]
         transform = column_def[:transform]
         value = self.instance_exec(value, &transform) if transform
