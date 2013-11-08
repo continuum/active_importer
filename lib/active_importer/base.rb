@@ -158,6 +158,8 @@ module ActiveImporter
       end
       fire_event :row_success
       true
+    ensure
+      fire_event :row_processed
     end
 
     def build_model

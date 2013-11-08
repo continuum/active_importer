@@ -60,6 +60,12 @@ describe ActiveImporter::Base do
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
       expect { EmployeeImporter.import('/dummy/file') }.to change(importer.row_errors, :count).by(2)
     end
+
+    it 'still notifies all rows as processed' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      expect(importer).to receive(:row_processed).exactly(4).times
+      EmployeeImporter.import('/dummy/file')
+    end
   end
 
   context 'when the import fails' do
