@@ -42,7 +42,14 @@ module ActiveImporter
     # Callbacks
     #
 
-    EVENTS = [:row_success, :row_error, :row_processed, :import_failed, :import_finished]
+    EVENTS = [
+      :row_success,
+      :row_error,
+      :row_processed,
+      :import_started,
+      :import_finished,
+      :import_failed,
+    ]
 
     def self.event_handlers
       @event_handlers ||= EVENTS.inject({}) { |hash, event| hash.merge({event => []}) }
@@ -92,6 +99,7 @@ module ActiveImporter
 
     def import
       return if @book.nil?
+      fire_event :import_started
       @data_row_indices.each do |index|
         @row_index = index
         @row = row_to_hash @book.row(index)

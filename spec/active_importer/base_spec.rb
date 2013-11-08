@@ -27,8 +27,9 @@ describe ActiveImporter::Base do
     EmployeeImporter.import('/dummy/file')
   end
 
-  it 'notifies when the import process has finished' do
+  it 'notifies when the import process starts and finishes' do
     expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+    expect(importer).to receive(:import_started).once
     expect(importer).to receive(:import_finished).once
     EmployeeImporter.import('/dummy/file')
   end
