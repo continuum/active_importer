@@ -71,7 +71,66 @@ of the spreadsheet.
 
 ### Callbacks
 
-TODO: Document callbacks
+An importer class can define blocks of code acting as callbacks, to be notified
+of certain events that occur while importing the data.
+
+```ruby
+class EmployeeImporter < ActiveImporter::Base
+  imports Employee
+
+  attr_reader :row_count
+
+  column 'First name', :first_name
+  column 'Last name', :last_name
+  column 'Department', :department do |department_name|
+    Department.find_by(name: department_name)
+  end
+
+  on :import_started do
+    @row_count = 0
+  end
+
+  on :row_processed do
+    @row_count += 1
+  end
+
+  on :import_finished do
+    send_notification("Data imported successfully!")
+  end
+
+  on :import_failed do |exception|
+    send_notification("Fatal error while importing data: #{exception.message}")
+  end
+
+  private
+
+  def send_notification(message)
+    # ...
+  end
+end
+```
+
+The supported events are:
+
+- **import_failed:** Fired once **before** the beginning of the data
+  processing, if the input data cannot be processed for some reason.  If this
+  event is fired by an importer, none of its other events are ever fired.
+- **import_started:** Fired once at the beginning of the data processing,
+  before the first row is processed.
+- **row_processed:** Fired once for each row that has been processed,
+  regardless of whether it resulted in success or error.
+- **row_success:** Fired once for each row that was imported successfully into
+  the data model.
+- **row_error:** Fired once for each row that was **not** imported successfully
+  into the data model.
+- **import_finished:** Fired once **after** all rows have been processed.
+
+More than one block of code can be provided for each of these events, and they
+will all be invoked in the same order in which they were declared.  All blocks
+are executed in the context of the importer instance, so they have access to
+all the importer attributes and instance variables.  Error-related events
+(`:import_failed` and `:row_error`) pass to the blocks the instance of the
+exception that provoked the error condition.
 
 ## Contributing
 

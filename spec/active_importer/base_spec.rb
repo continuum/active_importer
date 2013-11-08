@@ -27,8 +27,9 @@ describe ActiveImporter::Base do
     EmployeeImporter.import('/dummy/file')
   end
 
-  it 'notifies when the import process has finished' do
+  it 'notifies when the import process starts and finishes' do
     expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+    expect(importer).to receive(:import_started).once
     expect(importer).to receive(:import_finished).once
     EmployeeImporter.import('/dummy/file')
   end
@@ -58,6 +59,12 @@ describe ActiveImporter::Base do
     it 'keeps track of each error' do
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
       expect { EmployeeImporter.import('/dummy/file') }.to change(importer.row_errors, :count).by(2)
+    end
+
+    it 'still notifies all rows as processed' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      expect(importer).to receive(:row_processed).exactly(4).times
+      EmployeeImporter.import('/dummy/file')
     end
   end
 

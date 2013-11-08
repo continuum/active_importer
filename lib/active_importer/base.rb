@@ -39,6 +39,36 @@ module ActiveImporter
     end
 
     #
+    # Callbacks
+    #
+
+    EVENTS = [
+      :row_success,
+      :row_error,
+      :row_processed,
+      :import_started,
+      :import_finished,
+      :import_failed,
+    ]
+
+    def self.event_handlers
+      @event_handlers ||= EVENTS.inject({}) { |hash, event| hash.merge({event => []}) }
+    end
+
+    def self.on(event, &block)
+      raise "Unknown ActiveImporter event '#{event}'" unless EVENTS.include?(event)
+      event_handlers[event] << block
+    end
+
+    def fire_event(event, param = nil)
+      self.class.event_handlers[event].each do |block|
+        self.instance_exec(param, &block)
+      end
+    end
+
+    private :fire_event
+
+    #
     # Implementation
     #
 
@@ -60,7 +90,7 @@ module ActiveImporter
       @book = @header = nil
       @row_count = 0
       @row_index = 1
-      import_failed(e.message)
+      fire_event :import_failed, e
     end
 
     def fetch_model
@@ -69,12 +99,13 @@ module ActiveImporter
 
     def import
       return if @book.nil?
+      fire_event :import_started
       @data_row_indices.each do |index|
         @row_index = index
         @row = row_to_hash @book.row(index)
         import_row
       end
-      import_finished
+      fire_event :import_finished
     end
 
     def row_processed_count
@@ -90,18 +121,6 @@ module ActiveImporter
     end
 
     def hook
-    end
-
-    def row_success
-    end
-
-    def row_error(error_message)
-    end
-
-    def import_failed(error_message)
-    end
-
-    def import_finished
     end
 
     private
@@ -134,11 +153,13 @@ module ActiveImporter
         model.save!
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
-        row_error(e.message)
+        fire_event :row_error, e
         return false
       end
-      row_success
+      fire_event :row_success
       true
+    ensure
+      fire_event :row_processed
     end
 
     def build_model
