@@ -90,7 +90,7 @@ module ActiveImporter
       @book = @header = nil
       @row_count = 0
       @row_index = 1
-      fire_event :import_failed, e.message
+      fire_event :import_failed, e
     end
 
     def fetch_model
@@ -153,7 +153,7 @@ module ActiveImporter
         model.save!
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
-        fire_event :row_error, e.message
+        fire_event :row_error, e
         return false
       end
       fire_event :row_success
