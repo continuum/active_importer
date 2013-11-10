@@ -14,6 +14,7 @@ describe ActiveImporter::Base do
 
   before do
     expect(Roo::Spreadsheet).to receive(:open).and_return { Spreadsheet.new(spreadsheet_data) }
+    EmployeeImporter.instance_variable_set(:@fetch_model_block, nil)
   end
 
   it 'imports all data from the spreadsheet into the model' do
@@ -102,11 +103,9 @@ describe ActiveImporter::Base do
   end
 
   describe '.fetch_model' do
-    let(:model) { Employee.new }
-
     it 'controls what model instance is loaded for each given row' do
-      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
-      expect(importer).to receive(:fetch_model).twice.and_return(model)
+      model = Employee.new
+      EmployeeImporter.fetch_model { model }
       expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(1)
     end
   end

@@ -26,6 +26,14 @@ module ActiveImporter
       self.class.model_class
     end
 
+    def self.fetch_model(&block)
+      @fetch_model_block = block
+    end
+
+    def self.fetch_model_block
+      @fetch_model_block
+    end
+
     def self.column(title, field = nil, &block)
       title = title.strip
       if columns[title]
@@ -78,6 +86,7 @@ module ActiveImporter
 
     class << self
       private :fire_event
+      private :fetch_model_block
     end
 
     #
@@ -105,8 +114,16 @@ module ActiveImporter
       fire_event :import_failed, e
     end
 
+    def fetch_model_block
+      self.class.send(:fetch_model_block)
+    end
+
     def fetch_model
-      model_class.new
+      if fetch_model_block
+        self.instance_exec(&fetch_model_block)
+      else
+        model_class.new
+      end
     end
 
     def import
