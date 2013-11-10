@@ -142,7 +142,7 @@ module ActiveImporter
 
     def find_header_index
       (1..@book.last_row).each do |index|
-        row = @book.row(index).map(&:strip)
+        row = @book.row(index).map { |cell| cell.to_s.strip }
         return index if columns.keys.all? { |item| row.include?(item) }
       end
       return nil

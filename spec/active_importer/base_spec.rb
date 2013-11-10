@@ -88,7 +88,7 @@ describe ActiveImporter::Base do
     let(:spreadsheet_data) do
       [
         [],
-        ['List of employees', '', 'Company Name'],
+        ['List of employees', '', nil, 'Company Name'],
         ['Ordered by', 'Birth Date'],
         ['Name', 'Department', 'Birth Date', 'Manager'],
         ['John Doe', 'IT', '2013-10-25'],
