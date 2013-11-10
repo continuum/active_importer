@@ -1,8 +1,7 @@
 class DataModel
-  @@count = 0
 
   def self.count
-    @@count
+    @count ||= 0
   end
 
   attr_reader :errors
@@ -25,7 +24,7 @@ class DataModel
 
   def save
     if valid?
-      @@count += 1 if @new_record
+      self.class.send(:increment_count) if @new_record
       @new_record = false
       true
     else
@@ -43,10 +42,21 @@ class DataModel
 
   def valid?
     validate
-    @errors.empty?
+    errors.empty?
   end
 
   def validate
     # ...
+  end
+
+  private
+
+  def self.increment_count
+    count
+    @count += 1
+  end
+
+  class << self
+    private :increment_count
   end
 end

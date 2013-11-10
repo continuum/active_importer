@@ -5,7 +5,7 @@ class Employee < DataModel
   attr_accessor :name, :birth_date, :department, :department_id
 
   def validate
-    @errors << 'Invalid name' if name == 'Invalid'
+    errors << 'Invalid name' if name == 'Invalid'
   end
 end
 
