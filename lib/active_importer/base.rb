@@ -45,6 +45,7 @@ module ActiveImporter
     EVENTS = [
       :row_success,
       :row_error,
+      :row_processing,
       :row_processed,
       :import_started,
       :import_finished,
@@ -131,9 +132,6 @@ module ActiveImporter
       row_errors.count
     end
 
-    def hook
-    end
-
     private
 
     def columns
@@ -182,7 +180,7 @@ module ActiveImporter
         value = self.instance_exec(value, &transform) if transform
         model[field_name] = value
       end
-      hook
+      fire_event :row_processing
     end
 
     def row_to_hash(row)

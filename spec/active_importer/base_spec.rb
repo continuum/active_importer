@@ -111,10 +111,10 @@ describe ActiveImporter::Base do
     end
   end
 
-  describe '.hook' do
+  describe 'row_processing event' do
     it 'allows the importer to modify the model for each row' do
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
-      expect(importer).to receive(:hook).twice
+      expect(importer).to receive(:row_processing).twice
       EmployeeImporter.import('/dummy/file')
     end
   end
