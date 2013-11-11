@@ -80,10 +80,14 @@ class EmployeeImporter < ActiveImporter::Base
 
   attr_reader :row_count
 
-  column 'First name', :first_name
-  column 'Last name', :last_name
+  column 'First name'
+  column 'Last name'
   column 'Department', :department do |department_name|
     Department.find_by(name: department_name)
+  end
+
+  on :row_processing do
+    model.full_name = [row['First name'], row['Last name']].join(' ')
   end
 
   on :import_started do
@@ -117,6 +121,8 @@ The supported events are:
   event is fired by an importer, none of its other events are ever fired.
 - **import_started:** Fired once at the beginning of the data processing,
   before the first row is processed.
+- **row_processing:** Fired while the row is being processed to be imported
+  into a model instance.
 - **row_processed:** Fired once for each row that has been processed,
   regardless of whether it resulted in success or error.
 - **row_success:** Fired once for each row that was imported successfully into
@@ -131,6 +137,37 @@ are executed in the context of the importer instance, so they have access to
 all the importer attributes and instance variables.  Error-related events
 (`:import_failed` and `:row_error`) pass to the blocks the instance of the
 exception that provoked the error condition.
+
+Additionally, all the `row_*` events have access to the `row` and `model`
+variables, which reference the spreadsheet row being processed, and the model
+object where the row data is being stored, respectively.  This feature is
+specifically useful for the `:row_processing` event handler, which is triggered
+while a row is being processed, and before the corresponding data model is
+saved.  This allows to define any complex data-import logic that cannot be
+expressed in terms of mapping a column to a data field.
+
+### Selecting the model instance to import into
+
+By default, the importer will attempt to generate a new model instance per row
+processed.  The importer can be instructed to update records instead, if they
+already exist, instead of always attempting to generate a new one.
+
+```ruby
+class EmployeeImporter
+  imports Employee
+
+  fetch_model do
+    Employee.where(first_name: row['First name'], last_name: row['Last name']).first_or_initialize
+  end
+
+  # ...
+end
+```
+
+The code above specifies that, for each row, the importer should attempt to
+find an existing model for the employee with the first and last name in the row
+being processed.  If this record exist, the row data will be used to update the
+given model instance.  Otherwise, a new employee record will be created.
 
 ## Contributing
 
