@@ -100,6 +100,12 @@ describe ActiveImporter::Base do
     it 'smartly skips any rows before the header' do
       expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
     end
+
+    it 'reports the number of processed rows correctly' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      EmployeeImporter.import('/dummy/file')
+      expect(importer.row_processed_count).to eq(2)
+    end
   end
 
   describe '.fetch_model' do
