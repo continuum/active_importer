@@ -10,6 +10,17 @@ describe ActiveImporter::Base do
     ]
   end
 
+  let(:spreadsheet_data_with_errors) do
+    [
+      ['List of employees'],
+      ['Name', 'Birth Date', 'Department', 'Manager'],
+      ['John Doe', '2013-10-25', 'IT'],
+      ['Invalid', '2013-10-24', 'Management'],
+      ['Invalid', '2013-10-24', 'Accounting'],
+      ['Jane Doe', '2013-10-26', 'Sales'],
+    ]
+  end
+
   let(:importer) { EmployeeImporter.new('/dummy/file') }
 
   before do
@@ -36,16 +47,35 @@ describe ActiveImporter::Base do
     EmployeeImporter.import('/dummy/file')
   end
 
-  context 'when there are rows with errors' do
-    let(:spreadsheet_data) do
-      [
-        ['Name', 'Birth Date', 'Department', 'Manager'],
-        ['John Doe', '2013-10-25', 'IT'],
-        ['Invalid', '2013-10-24', 'Management'],
-        ['Invalid', '2013-10-24', 'Accounting'],
-        ['Jane Doe', '2013-10-26', 'Sales'],
-      ]
+  context do
+    let(:spreadsheet_data) { spreadsheet_data_with_errors }
+
+    before do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      EmployeeImporter.import('/dummy/file')
     end
+
+    describe '.row_processed_count' do
+      it 'reports the number of rows processed' do
+        expect(importer.row_processed_count).to eq(4)
+      end
+    end
+
+    describe '.row_success_count' do
+      it 'reports the number of rows imported successfully' do
+        expect(importer.row_success_count).to eq(2)
+      end
+    end
+
+    describe '.row_error_count' do
+      it 'reports the number of rows with errors' do
+        expect(importer.row_error_count).to eq(2)
+      end
+    end
+  end
+
+  context 'when there are rows with errors' do
+    let(:spreadsheet_data) { spreadsheet_data_with_errors }
 
     it 'does not import those rows' do
       expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
