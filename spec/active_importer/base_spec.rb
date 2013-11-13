@@ -24,8 +24,9 @@ describe ActiveImporter::Base do
   let(:importer) { EmployeeImporter.new('/dummy/file') }
 
   before do
-    expect(Roo::Spreadsheet).to receive(:open).and_return { Spreadsheet.new(spreadsheet_data) }
+    expect(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return { Spreadsheet.new(spreadsheet_data) }
     EmployeeImporter.instance_variable_set(:@fetch_model_block, nil)
+    EmployeeImporter.instance_variable_set(:@sheet_index, nil)
   end
 
   it 'imports all data from the spreadsheet into the model' do
@@ -150,6 +151,39 @@ describe ActiveImporter::Base do
     it 'allows the importer to modify the model for each row' do
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
       expect(importer).to receive(:row_processing).twice
+      EmployeeImporter.import('/dummy/file')
+    end
+  end
+
+  context 'when spreadsheet has multiple sheets' do
+    let(:spreadsheet_data) do
+      {
+        "Employees" => [
+          [' Name ', 'Birth Date', 'Department', 'Manager'],
+          ['John Doe', '2013-10-25', 'IT'],
+          ['Jane Doe', '2013-10-26', 'Sales'],
+        ],
+        "Outstanding employees" => [
+          [' Name ', 'Birth Date', 'Department', 'Manager'],
+          ['Jane Doe', '2013-10-26', 'Sales'],
+        ],
+      }
+    end
+
+    it 'uses the first sheet by default' do
+      expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
+    end
+
+    it 'uses another sheet if instructed to do so' do
+      EmployeeImporter.sheet 1
+      expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
+      EmployeeImporter.sheet "Outstanding employees"
+      expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(1)
+    end
+
+    it 'fails if the specified sheet cannot be found' do
+      expect_any_instance_of(EmployeeImporter).to receive(:import_failed)
+      EmployeeImporter.sheet 5
       EmployeeImporter.import('/dummy/file')
     end
   end

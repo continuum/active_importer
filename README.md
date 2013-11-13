@@ -169,6 +169,39 @@ find an existing model for the employee with the first and last name in the row
 being processed.  If this record exist, the row data will be used to update the
 given model instance.  Otherwise, a new employee record will be created.
 
+### Selecting the sheet to get data from
+
+Spreadsheet files often have more than one sheet of data, so it is desirable to
+select which sheet to use when importing.
+
+```ruby
+class EmployeeImporter
+  imports Employee
+
+  sheet "Employees"
+
+  # ...
+end
+```
+
+The importer defined above specifies that data should be read from a sheet
+named "Employees".  By default an importer will read from the first sheet in
+the spreadsheet.
+
+Also, sheets can be specified by name or by index, starting by 1, which is the
+first sheet.  For instance, the following importer will read data from the
+third sheet, no matter what's its name.
+
+```ruby
+class EmployeeImporter
+  imports Employee
+
+  sheet 3
+
+  # ...
+end
+```
+
 ## Contributing
 
 1. Fork it

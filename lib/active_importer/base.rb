@@ -26,6 +26,10 @@ module ActiveImporter
       self.class.model_class
     end
 
+    def self.sheet(index)
+      @sheet_index = index
+    end
+
     def self.fetch_model(&block)
       @fetch_model_block = block
     end
@@ -103,6 +107,7 @@ module ActiveImporter
       @context = options.delete(:context)
 
       @book = Roo::Spreadsheet.open(file, options)
+      load_sheet
       load_header
 
       @data_row_indices = ((@header_index+1)..@book.last_row)
@@ -155,6 +160,14 @@ module ActiveImporter
 
     def columns
       self.class.columns
+    end
+
+    def load_sheet
+      sheet_index = self.class.instance_variable_get(:@sheet_index)
+      if sheet_index
+        sheet_index = @book.sheets[sheet_index-1] if sheet_index.is_a?(Fixnum)
+        @book.default_sheet = sheet_index.to_s
+      end
     end
 
     def find_header_index
