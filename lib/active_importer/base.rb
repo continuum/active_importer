@@ -138,7 +138,9 @@ module ActiveImporter
     end
 
     def row_processed_count
-      row_index - 1
+      row_index - @header_index
+    rescue
+      0
     end
 
     def row_success_count
