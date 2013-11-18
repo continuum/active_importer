@@ -210,7 +210,7 @@ module ActiveImporter
         field_name = column_def[:field_name]
         transform = column_def[:transform]
         value = self.instance_exec(value, &transform) if transform
-        model[field_name] = value
+        model.send("#{field_name}=", value)
       end
       fire_event :row_processing
     end
