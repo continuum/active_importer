@@ -207,4 +207,25 @@ describe ActiveImporter::Base do
       EmployeeImporter.import('/dummy/file')
     end
   end
+
+  describe '.skip_rows_if' do
+    let(:spreadsheet_data) do
+      [
+        [' Name ', 'Birth Date', 'Department', 'Manager'],
+        ['Skip', '2013-10-25', 'IT'],
+        ['John Doe', '2013-10-25', 'IT'],
+        ['Jane Doe', '2013-10-26', 'Sales'],
+      ]
+    end
+
+    it 'skips processing the current row' do
+      expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
+    end
+
+    it 'invokes event :row_skipped for each skipped row' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      expect(importer).to receive(:row_skipped).once
+      EmployeeImporter.import('/dummy/file')
+    end
+  end
 end

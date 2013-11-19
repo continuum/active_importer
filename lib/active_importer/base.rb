@@ -44,6 +44,14 @@ module ActiveImporter
       @fetch_model_block
     end
 
+    def self.skip_rows_if(&block)
+      @skip_rows_block = block
+    end
+
+    def self.skip_rows_block
+      @skip_rows_block
+    end
+
     def self.column(title, field = nil, &block)
       title = title.strip
       if columns[title]
@@ -64,6 +72,7 @@ module ActiveImporter
       :row_success,
       :row_error,
       :row_processing,
+      :row_skipped,
       :row_processed,
       :import_started,
       :import_finished,
@@ -144,6 +153,10 @@ module ActiveImporter
       @data_row_indices.each do |index|
         @row_index = index
         @row = row_to_hash @book.row(index)
+        if skip_row?
+          fire_event :row_skipped
+          next
+        end
         import_row
         if @aborted
           fire_event :import_aborted
@@ -171,6 +184,11 @@ module ActiveImporter
 
     def columns
       self.class.columns
+    end
+
+    def skip_row?
+      block = self.class.skip_rows_block
+      block.nil? || self.instance_exec(&block)
     end
 
     def load_sheet

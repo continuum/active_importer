@@ -32,6 +32,10 @@ class EmployeeImporter < EmployeeBaseImporter
     abort! if row['Name'] == 'Abort'
   end
 
+  skip_rows_if do
+    row['Name'] == 'Skip'
+  end
+
   def find_department(name)
     name.length # Quick dummy way to get an integer out of a string
   end

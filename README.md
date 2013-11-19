@@ -123,6 +123,8 @@ The supported events are:
   before the first row is processed.
 - **row_processing:** Fired while the row is being processed to be imported
   into a model instance.
+- **row_skipped:** Fired once for each row that matches the `skip_rows_if`
+  condition, if any.
 - **row_processed:** Fired once for each row that has been processed,
   regardless of whether it resulted in success or error.
 - **row_success:** Fired once for each row that was imported successfully into
