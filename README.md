@@ -130,6 +130,8 @@ The supported events are:
 - **row_error:** Fired once for each row that was **not** imported successfully
   into the data model.
 - **import_finished:** Fired once **after** all rows have been processed.
+- **import_aborted:** Fired once if the import process is aborted by invoking
+  `abort!`.
 
 More than one block of code can be provided for each of these events, and they
 will all be invoked in the same order in which they were declared.  All blocks

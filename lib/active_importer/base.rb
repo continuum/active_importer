@@ -7,6 +7,12 @@ module ActiveImporter
     # DSL and class variables
     #
 
+    @aborted = false
+
+    def abort!
+      @aborted = true
+    end
+
     @model_class = nil
     @columns = {}
 
@@ -62,6 +68,7 @@ module ActiveImporter
       :import_started,
       :import_finished,
       :import_failed,
+      :import_aborted,
     ]
 
     def self.event_handlers
@@ -138,6 +145,10 @@ module ActiveImporter
         @row_index = index
         @row = row_to_hash @book.row(index)
         import_row
+        if @aborted
+          fire_event :import_aborted
+          break
+        end
       end
       fire_event :import_finished
     end
@@ -191,7 +202,7 @@ module ActiveImporter
       begin
         @model = fetch_model
         build_model
-        model.save!
+        model.save! unless @aborted
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
         fire_event :row_error, e

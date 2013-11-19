@@ -187,4 +187,24 @@ describe ActiveImporter::Base do
       EmployeeImporter.import('/dummy/file')
     end
   end
+
+  describe '#abort!' do
+    let(:spreadsheet_data) do
+      [
+        [' Name ', 'Birth Date', 'Department', 'Manager'],
+        ['John Doe', '2013-10-25', 'IT'],
+        ['Abort', '2013-10-25', 'IT'],
+        ['Jane Doe', '2013-10-26', 'Sales'],
+      ]
+    end
+
+    it 'causes the import process to abort without processing any more rows' do
+      expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(1)
+    end
+
+    it 'does not report an error for the row where the abortion occured' do
+      expect(importer).not_to receive(:row_error)
+      EmployeeImporter.import('/dummy/file')
+    end
+  end
 end
