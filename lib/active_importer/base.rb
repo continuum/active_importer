@@ -17,9 +17,6 @@ module ActiveImporter
       !!@abort_message
     end
 
-    @model_class = nil
-    @columns = {}
-
     def self.imports(klass)
       @model_class = klass
     end
