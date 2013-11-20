@@ -188,7 +188,7 @@ module ActiveImporter
 
     def skip_row?
       block = self.class.skip_rows_block
-      block.nil? || self.instance_exec(&block)
+      block && self.instance_exec(&block)
     end
 
     def load_sheet
