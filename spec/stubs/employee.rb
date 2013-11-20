@@ -29,7 +29,7 @@ class EmployeeImporter < EmployeeBaseImporter
   end
 
   on :row_processing do
-    abort! if row['Name'] == 'Abort'
+    abort!('Row cannot be processed') if row['Name'] == 'Abort'
   end
 
   skip_rows_if do

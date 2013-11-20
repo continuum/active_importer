@@ -7,10 +7,14 @@ module ActiveImporter
     # DSL and class variables
     #
 
-    @aborted = false
+    @abort_message = nil
 
-    def abort!
-      @aborted = true
+    def abort!(message)
+      @abort_message = message
+    end
+
+    def aborted?
+      !!@abort_message
     end
 
     @model_class = nil
@@ -158,8 +162,8 @@ module ActiveImporter
           next
         end
         import_row
-        if @aborted
-          fire_event :import_aborted
+        if aborted?
+          fire_event :import_aborted, @abort_message
           break
         end
       end
@@ -220,7 +224,7 @@ module ActiveImporter
       begin
         @model = fetch_model
         build_model
-        model.save! unless @aborted
+        model.save! unless aborted?
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
         fire_event :row_error, e
