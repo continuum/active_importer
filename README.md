@@ -48,7 +48,7 @@ columns declared.  Any extra columns are ignored.  Any errors while processing
 the data file does not interrupt the whole process.  Instead, errors are
 notified via some callbacks defined in the importer (see below).
 
-### Supported formats
+### File extension and supported formats
 
 This library currently supports reading from most spreadsheet formats, thanks
 to the wonderfull [roo](https://github.com/Empact/roo) gem.  Specifically, the
@@ -60,6 +60,20 @@ following formats are supported:
 * Excelx
 * LibreOffice
 * CSV
+
+The filename should contain the extension so the library knows which format to
+expect.  If the filename does not include the extension, or if for some reason
+you need to force the extension to something else, you can pass it as an option
+to the `import` method, like shown below:
+
+```ruby
+EmployeeImporter.import('/path/to/file_without_extension', :extension => :xlsx)
+```
+
+This is useful in cases where you are using an uploaded file, which are usually
+stored in temporary files with random names and no extension.
+
+### Header rows
 
 The spreadsheet contents are scanned, row by row, until a row is found that
 matches the expect header column, which should contain header cells for all the
