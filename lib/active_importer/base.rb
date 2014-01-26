@@ -8,6 +8,7 @@ module ActiveImporter
     #
 
     @abort_message = nil
+    @abort_on_row_error = nil
 
     def abort!(message)
       @abort_message = message
@@ -15,6 +16,10 @@ module ActiveImporter
 
     def aborted?
       !!@abort_message
+    end
+
+    def self.abort_on_row_error
+      @abort_on_row_error = true
     end
 
     def self.imports(klass)
@@ -149,22 +154,30 @@ module ActiveImporter
     end
 
     def import
-      return if @book.nil?
-      fire_event :import_started
-      @data_row_indices.each do |index|
-        @row_index = index
-        @row = row_to_hash @book.row(index)
-        if skip_row?
-          fire_event :row_skipped
-          next
-        end
-        import_row
-        if aborted?
-          fire_event :import_aborted, @abort_message
-          break
+      ActiveRecord::Base.transaction do
+        return if @book.nil?
+        fire_event :import_started
+        @import_status = true
+        @data_row_indices.each do |index|
+          @row_index = index
+          @row = row_to_hash @book.row(index)
+          if skip_row?
+            fire_event :row_skipped
+            next
+          end
+          import_row
+          if aborted?
+            fire_event :import_aborted, @abort_message
+            if self.class.instance_variable_get(:@abort_on_row_error)
+                @import_status = false
+                raise ActiveRecord::Rollback 
+            end
+            break
+          end
         end
       end
       fire_event :import_finished
+      return @import_status
     end
 
     def row_processed_count
@@ -225,6 +238,9 @@ module ActiveImporter
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
         fire_event :row_error, e
+        if self.class.instance_variable_get(:@abort_on_row_error)
+          abort!("Aborted because of a row error: #{e}")
+        end
         return false
       end
       fire_event :row_success
