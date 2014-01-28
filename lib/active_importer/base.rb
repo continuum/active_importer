@@ -66,6 +66,35 @@ module ActiveImporter
     end
 
     #
+    # Transactions
+    #
+
+    def self.transaction(flag)
+      if flag
+        raise "Model class does not support transactions" unless @model_class.respond_to?(:transaction)
+      end
+      @transaction = flag
+    end
+
+    def self.use_transaction?
+      @transaction || false
+    end
+
+    def use_transaction?
+      self.class.use_transaction?
+    end
+
+    def transaction
+      if use_transaction?
+        model_class.transaction { yield }
+      else
+        yield
+      end
+    end
+
+    private :transaction
+
+    #
     # Callbacks
     #
 
@@ -149,22 +178,24 @@ module ActiveImporter
     end
 
     def import
-      return if @book.nil?
-      fire_event :import_started
-      @data_row_indices.each do |index|
-        @row_index = index
-        @row = row_to_hash @book.row(index)
-        if skip_row?
-          fire_event :row_skipped
-          next
+      transaction do
+        return if @book.nil?
+        fire_event :import_started
+        @data_row_indices.each do |index|
+          @row_index = index
+          @row = row_to_hash @book.row(index)
+          if skip_row?
+            fire_event :row_skipped
+            next
+          end
+          import_row
+          if aborted?
+            fire_event :import_aborted, @abort_message
+            break
+          end
         end
-        import_row
-        if aborted?
-          fire_event :import_aborted, @abort_message
-          break
-        end
+        fire_event :import_finished
       end
-      fire_event :import_finished
     end
 
     def row_processed_count

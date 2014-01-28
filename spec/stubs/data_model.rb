@@ -49,6 +49,14 @@ class DataModel
     # ...
   end
 
+  def self.transaction
+    yield
+  end
+
+  def transaction(&block)
+    self.class.transaction(&block)
+  end
+
   private
 
   def self.increment_count

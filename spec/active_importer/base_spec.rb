@@ -27,6 +27,7 @@ describe ActiveImporter::Base do
     expect(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return { Spreadsheet.new(spreadsheet_data) }
     EmployeeImporter.instance_variable_set(:@fetch_model_block, nil)
     EmployeeImporter.instance_variable_set(:@sheet_index, nil)
+    EmployeeImporter.transaction(false)
   end
 
   it 'imports all data from the spreadsheet into the model' do
@@ -225,6 +226,22 @@ describe ActiveImporter::Base do
     it 'invokes event :row_skipped for each skipped row' do
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
       expect(importer).to receive(:row_skipped).once
+      EmployeeImporter.import('/dummy/file')
+    end
+  end
+
+  describe '.transaction(true)' do
+    it 'instructs the importer to enclose the process inside Model.transaction' do
+      EmployeeImporter.transaction(true)
+      expect(Employee).to receive(:transaction).once.and_call_original
+      EmployeeImporter.import('/dummy/file')
+    end
+  end
+
+  describe '.transaction(false)' do
+    it 'instructs the importer not to enclose the process inside Model.transaction' do
+      EmployeeImporter.transaction(false)
+      expect(Employee).not_to receive(:transaction)
       EmployeeImporter.import('/dummy/file')
     end
   end
