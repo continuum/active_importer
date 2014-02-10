@@ -117,11 +117,11 @@ module ActiveImporter
     attr_reader :header, :row, :model
     attr_reader :row_count, :row_index
     attr_reader :row_errors
-    attr_reader :context
+    attr_reader :params
 
     def initialize(file, options = {})
       @row_errors = []
-      @context = options.delete(:context)
+      @params = options.delete(:params)
 
       @book = Roo::Spreadsheet.open(file, options)
       load_sheet
