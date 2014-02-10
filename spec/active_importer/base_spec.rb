@@ -26,7 +26,7 @@ describe ActiveImporter::Base do
     expect(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return { Spreadsheet.new(spreadsheet_data) }
     EmployeeImporter.instance_variable_set(:@fetch_model_block, nil)
     EmployeeImporter.instance_variable_set(:@sheet_index, nil)
-    EmployeeImporter.transaction(false)
+    EmployeeImporter.transactional(false)
   end
 
   it 'imports all data from the spreadsheet into the model' do
@@ -237,7 +237,7 @@ describe ActiveImporter::Base do
     end
 
     context 'when called with true as an argument' do
-      before(:each) { EmployeeImporter.transaction(true) }
+      before(:each) { EmployeeImporter.transactional(true) }
 
       it 'runs the import process within a transaction' do
         expect {
@@ -269,6 +269,7 @@ describe ActiveImporter::Base do
 
     context 'when called with false as an argument' do
       it 'does not run the import process within a transactio' do
+        EmployeeImporter.transactional(false)
         expect {
           EmployeeImporter.import('/dummy/file')
         }.to change(Employee, :count).by(2)

@@ -69,7 +69,7 @@ module ActiveImporter
     # Transactions
     #
 
-    def self.transaction(flag)
+    def self.transactional(flag = true)
       if flag
         raise "Model class does not support transactions" unless @model_class.respond_to?(:transaction)
       end
