@@ -194,8 +194,12 @@ module ActiveImporter
             break
           end
         end
-        fire_event :import_finished
       end
+    rescue => e
+      fire_event :import_aborted, e.message
+      raise
+    ensure
+      fire_event :import_finished
     end
 
     def row_processed_count
@@ -256,6 +260,7 @@ module ActiveImporter
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
         fire_event :row_error, e
+        raise if use_transaction?
         return false
       end
       fire_event :row_success
