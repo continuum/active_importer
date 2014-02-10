@@ -48,6 +48,11 @@ describe ActiveImporter::Base do
     EmployeeImporter.import('/dummy/file')
   end
 
+  it 'can receive custom parameters via the `params` option' do
+    importer = EmployeeImporter.new('/dummy/file', params: 'anything')
+    expect(importer.params).to eql('anything')
+  end
+
   context do
     let(:spreadsheet_data) { spreadsheet_data_with_errors }
 
