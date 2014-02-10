@@ -220,6 +220,39 @@ class EmployeeImporter
 end
 ```
 
+### Transactions
+
+Importers can be instructed to work within a database transaction.
+
+```ruby
+class EmployeeImporter
+  imports Employee
+  transactional
+
+  # ...
+end
+```
+
+This transaction mode works transparently when using ActiveRecord and
+[DataMapper](http://datamapper.org), two of the most popular Ruby ORM's.  Any
+other library can be easily adapted to use the same approach.
+
+It's important to note that when this mode is activated, the importer will
+implicitly abort when a row error occurs, and the exception that caused the
+error will be exposed to the caller of `EmployeeImporter.import(filename)`.
+And of course, any changes performed to the database during the import process
+prior to the error will be rolled back.
+
+Callbacks are still invoked as usual.  When a row error occurs, the
+`:row_error` event is still invoked, as well as the `:import_aborted` and
+`:import_finished` events, in that order.
+
+Transactional mode is in an alpha stage of testing, so it is still not included
+in the released gem.  If you wanna give it a try, put the following in your
+`Gemfile`:
+
+    gem 'active_importer', github: 'continuum/active_importer', branch: 'feature/transactions'
+
 ## Contributing
 
 1. Fork it
