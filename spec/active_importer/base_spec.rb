@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'stubs/employee'
 
 describe ActiveImporter::Base do
   let(:spreadsheet_data) do
