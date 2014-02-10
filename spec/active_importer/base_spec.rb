@@ -229,19 +229,50 @@ describe ActiveImporter::Base do
     end
   end
 
-  describe '.transaction(true)' do
-    it 'instructs the importer to enclose the process inside Model.transaction' do
-      EmployeeImporter.transaction(true)
-      expect(Employee).to receive(:transaction).once.and_call_original
-      EmployeeImporter.import('/dummy/file')
-    end
-  end
+  describe '.transaction' do
+    let(:spreadsheet_data) { spreadsheet_data_with_errors }
 
-  describe '.transaction(false)' do
-    it 'instructs the importer not to enclose the process inside Model.transaction' do
-      EmployeeImporter.transaction(false)
-      expect(Employee).not_to receive(:transaction)
-      EmployeeImporter.import('/dummy/file')
+    before(:each) do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+    end
+
+    context 'when called with true as an argument' do
+      before(:each) { EmployeeImporter.transaction(true) }
+
+      it 'runs the import process within a transaction' do
+        expect {
+          EmployeeImporter.import('/dummy/file') rescue nil
+        }.not_to change(Employee, :count)
+      end
+
+      it 'exposes the exception that aborted the transaction' do
+        expect {
+          EmployeeImporter.import('/dummy/file')
+        }.to raise_error
+      end
+
+      it 'still invokes the :row_error event' do
+        expect(importer).to receive(:row_error)
+        EmployeeImporter.import('/dummy/file') rescue nil
+      end
+
+      it 'still invokes the :import_finished event' do
+        expect(importer).to receive(:import_finished)
+        EmployeeImporter.import('/dummy/file') rescue nil
+      end
+
+      it 'invokes the :import_aborted event' do
+        expect(importer).to receive(:import_aborted)
+        EmployeeImporter.import('/dummy/file') rescue nil
+      end
+    end
+
+    context 'when called with false as an argument' do
+      it 'does not run the import process within a transactio' do
+        expect {
+          EmployeeImporter.import('/dummy/file')
+        }.to change(Employee, :count).by(2)
+      end
     end
   end
 end
