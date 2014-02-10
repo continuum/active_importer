@@ -48,6 +48,27 @@ columns declared.  Any extra columns are ignored.  Any errors while processing
 the data file does not interrupt the whole process.  Instead, errors are
 notified via some callbacks defined in the importer (see below).
 
+### Custom parameters
+
+You can pass an object as custom parameters to the importer.  These will be
+available during the import process.
+
+```ruby
+EmployeeImporter.import('/path/to/file.xls', params: { owner_id: current_user.id })
+```
+
+Then in the importer class:
+
+```ruby
+class EmployeeImporter < ActiveImporter::Base
+  imports Employee
+
+  on :row_processing do
+    model.owner_id = params[:owner_id]
+  end
+end
+```
+
 ### File extension and supported formats
 
 This library currently supports reading from most spreadsheet formats, thanks
