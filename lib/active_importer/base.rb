@@ -166,6 +166,7 @@ module ActiveImporter
       @row_count = 0
       @row_index = 1
       fire_event :import_failed, e
+      raise
     end
 
     def fetch_model_block

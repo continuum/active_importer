@@ -117,7 +117,9 @@ describe ActiveImporter::Base do
 
     it 'notifies the failure' do
       expect_any_instance_of(EmployeeImporter).to receive(:import_failed)
-      EmployeeImporter.import('/dummy/file')
+      expect {
+        EmployeeImporter.import('/dummy/file')
+      }.to raise_error
     end
   end
 
@@ -189,7 +191,9 @@ describe ActiveImporter::Base do
     it 'fails if the specified sheet cannot be found' do
       expect_any_instance_of(EmployeeImporter).to receive(:import_failed)
       EmployeeImporter.sheet 5
-      EmployeeImporter.import('/dummy/file')
+      expect {
+        EmployeeImporter.import('/dummy/file')
+      }.to raise_error
     end
   end
 
@@ -247,7 +251,9 @@ describe ActiveImporter::Base do
       it 'does not override the class-wide setting' do
         EmployeeImporter.transactional(true)
         expect_any_instance_of(EmployeeImporter).to receive(:import_failed)
-        EmployeeImporter.new('/dummy/file', transactional: false)
+        expect {
+          EmployeeImporter.new('/dummy/file', transactional: false)
+        }.to raise_error
       end
     end
   end
