@@ -1,14 +1,3 @@
-require 'stubs/data_model'
-require 'stubs/spreadsheet'
-
-class Employee < DataModel
-  attr_accessor :name, :birth_date, :department, :department_id
-
-  def validate
-    errors << 'Invalid name' if name == 'Invalid'
-  end
-end
-
 class EmployeeBaseImporter < ActiveImporter::Base
   on(:import_finished) { base_import_finished }
 
