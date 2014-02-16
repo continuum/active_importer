@@ -73,19 +73,19 @@ module ActiveImporter
       if flag
         raise "Model class does not support transactions" unless @model_class.respond_to?(:transaction)
       end
-      @transaction = flag
+      @transactional = !!flag
     end
 
-    def self.use_transaction?
-      @transaction || false
+    def self.transactional?
+      @transactional || false
     end
 
-    def use_transaction?
-      self.class.use_transaction?
+    def transactional?
+      self.class.transactional?
     end
 
     def transaction
-      if use_transaction?
+      if transactional?
         model_class.transaction { yield }
       else
         yield
@@ -260,7 +260,7 @@ module ActiveImporter
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
         fire_event :row_error, e
-        raise if use_transaction?
+        raise if transactional?
         return false
       end
       fire_event :row_success

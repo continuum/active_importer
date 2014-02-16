@@ -229,15 +229,21 @@ describe ActiveImporter::Base do
     end
   end
 
-  describe '.transaction' do
+  describe '.transactional' do
     let(:spreadsheet_data) { spreadsheet_data_with_errors }
 
     before(:each) do
-      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      allow(EmployeeImporter).to receive(:new).once.and_return(importer)
     end
 
     context 'when called with true as an argument' do
       before(:each) { EmployeeImporter.transactional(true) }
+
+      it 'declares all importers of its kind to be transactional' do
+        expect(EmployeeImporter).to be_transactional
+        importer = EmployeeImporter.new('/dummy/file')
+        expect(importer).to be_transactional
+      end
 
       it 'runs the import process within a transaction' do
         expect {
@@ -273,6 +279,12 @@ describe ActiveImporter::Base do
         expect {
           EmployeeImporter.import('/dummy/file')
         }.to change(Employee, :count).by(2)
+      end
+
+      it 'declares all importers of its kind not to be transactional' do
+        expect(EmployeeImporter).not_to be_transactional
+        importer = EmployeeImporter.new('/dummy/file')
+        expect(importer).not_to be_transactional
       end
     end
   end
