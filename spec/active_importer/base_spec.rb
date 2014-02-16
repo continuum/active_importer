@@ -23,7 +23,7 @@ describe ActiveImporter::Base do
   let(:importer) { EmployeeImporter.new('/dummy/file') }
 
   before do
-    expect(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return { Spreadsheet.new(spreadsheet_data) }
+    allow(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return { Spreadsheet.new(spreadsheet_data) }
     EmployeeImporter.instance_variable_set(:@fetch_model_block, nil)
     EmployeeImporter.instance_variable_set(:@sheet_index, nil)
     EmployeeImporter.transactional(false)
@@ -226,6 +226,24 @@ describe ActiveImporter::Base do
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
       expect(importer).to receive(:row_skipped).once
       EmployeeImporter.import('/dummy/file')
+    end
+  end
+
+  describe '#initialize' do
+    context "when invoked with option 'transactional: true'" do
+      it 'declares the instance to be transactional even when the importer class is not' do
+        EmployeeImporter.transactional(false)
+        importer = EmployeeImporter.new('/dummy/file', transactional: true)
+        expect(importer).to be_transactional
+      end
+    end
+
+    context "when invoked with option 'transactional: false'" do
+      it 'does not override the class-wide setting' do
+        EmployeeImporter.transactional(true)
+        expect_any_instance_of(EmployeeImporter).to receive(:import_failed)
+        EmployeeImporter.new('/dummy/file', transactional: false)
+      end
     end
   end
 

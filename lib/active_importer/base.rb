@@ -81,7 +81,7 @@ module ActiveImporter
     end
 
     def transactional?
-      self.class.transactional?
+      @transactional || self.class.transactional?
     end
 
     def transaction
@@ -151,6 +151,9 @@ module ActiveImporter
     def initialize(file, options = {})
       @row_errors = []
       @context = options.delete(:context)
+      @transactional = options.fetch(:transactional, self.class.transactional?)
+
+      raise "Importer is declared transactional at the class level" if !@transactional && self.class.transactional?
 
       @book = Roo::Spreadsheet.open(file, options)
       load_sheet
