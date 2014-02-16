@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'stubs/employee'
 
 describe ActiveImporter::Base do
   let(:spreadsheet_data) do
@@ -27,6 +26,7 @@ describe ActiveImporter::Base do
     expect(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return { Spreadsheet.new(spreadsheet_data) }
     EmployeeImporter.instance_variable_set(:@fetch_model_block, nil)
     EmployeeImporter.instance_variable_set(:@sheet_index, nil)
+    EmployeeImporter.transactional(false)
   end
 
   it 'imports all data from the spreadsheet into the model' do
@@ -231,6 +231,54 @@ describe ActiveImporter::Base do
       expect(EmployeeImporter).to receive(:new).once.and_return(importer)
       expect(importer).to receive(:row_skipped).once
       EmployeeImporter.import('/dummy/file')
+    end
+  end
+
+  describe '.transaction' do
+    let(:spreadsheet_data) { spreadsheet_data_with_errors }
+
+    before(:each) do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+    end
+
+    context 'when called with true as an argument' do
+      before(:each) { EmployeeImporter.transactional(true) }
+
+      it 'runs the import process within a transaction' do
+        expect {
+          EmployeeImporter.import('/dummy/file') rescue nil
+        }.not_to change(Employee, :count)
+      end
+
+      it 'exposes the exception that aborted the transaction' do
+        expect {
+          EmployeeImporter.import('/dummy/file')
+        }.to raise_error
+      end
+
+      it 'still invokes the :row_error event' do
+        expect(importer).to receive(:row_error)
+        EmployeeImporter.import('/dummy/file') rescue nil
+      end
+
+      it 'still invokes the :import_finished event' do
+        expect(importer).to receive(:import_finished)
+        EmployeeImporter.import('/dummy/file') rescue nil
+      end
+
+      it 'invokes the :import_aborted event' do
+        expect(importer).to receive(:import_aborted)
+        EmployeeImporter.import('/dummy/file') rescue nil
+      end
+    end
+
+    context 'when called with false as an argument' do
+      it 'does not run the import process within a transactio' do
+        EmployeeImporter.transactional(false)
+        expect {
+          EmployeeImporter.import('/dummy/file')
+        }.to change(Employee, :count).by(2)
+      end
     end
   end
 end
