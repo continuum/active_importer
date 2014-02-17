@@ -29,6 +29,12 @@ describe ActiveImporter::Base do
     EmployeeImporter.transactional(false)
   end
 
+  describe '.column' do
+    it 'does not allow a column with block and no attribute' do
+      expect { EmployeeImporter.column('Dummy') {} }.to raise_error
+    end
+  end
+
   it 'imports all data from the spreadsheet into the model' do
     expect { EmployeeImporter.import('/dummy/file') }.to change(Employee, :count).by(2)
   end

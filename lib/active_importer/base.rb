@@ -58,6 +58,11 @@ module ActiveImporter
       if columns[title]
         raise "Duplicate importer column '#{title}'"
       end
+
+      if field.nil? && block_given?
+        raise "Invalid column '#{title}': must have a corresponding attribute, or it shouldn't have a block"
+      end
+
       columns[title] = { field_name: field, transform: block }
     end
 
