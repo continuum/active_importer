@@ -13,6 +13,8 @@ class EmployeeImporter < EmployeeBaseImporter
   column 'Name', :name
   column 'Birth Date', :birth_date
   column 'Manager'
+  column 'Unused', :unused_field, optional: true
+  column 'Extra', optional: true
   column '  Department ', :department_id do |value|
     find_department(value)
   end

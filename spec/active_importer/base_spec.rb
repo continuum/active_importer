@@ -60,6 +60,23 @@ describe ActiveImporter::Base do
   end
 
   context do
+    let(:spreadsheet_data) do
+      [
+        [' Name ', 'Birth Date', 'Department', 'Unused', 'Manager'],
+        ['Mary', '2013-10-25', 'IT', 'hello'],
+        ['John', '2013-10-26', 'Sales', 'world'],
+      ]
+    end
+
+    it 'processes optional columns when present' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      expect {
+        EmployeeImporter.import('/dummy/file')
+      }.to change(Employee.where.not(unused_field: nil), :count).by(2)
+    end
+  end
+
+  context do
     let(:spreadsheet_data) { spreadsheet_data_with_errors }
 
     before do

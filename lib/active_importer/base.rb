@@ -53,17 +53,29 @@ module ActiveImporter
       @skip_rows_block
     end
 
-    def self.column(title, field = nil, &block)
+    def self.column(title, field = nil, options = nil, &block)
       title = title.strip
       if columns[title]
         raise "Duplicate importer column '#{title}'"
+      end
+
+      if field.is_a?(Hash)
+        raise "Invalid column '#{title}': expected a single set of options" unless options.nil?
+        options = field
+        field = nil
+      else
+        options ||= {}
       end
 
       if field.nil? && block_given?
         raise "Invalid column '#{title}': must have a corresponding attribute, or it shouldn't have a block"
       end
 
-      columns[title] = { field_name: field, transform: block }
+      columns[title] = {
+        field_name: field,
+        transform: block,
+        optional: !!options[:optional],
+      }
     end
 
     def self.import(file, options = {})
@@ -245,9 +257,10 @@ module ActiveImporter
     end
 
     def find_header_index
+      required_column_keys = columns.keys.reject { |title| columns[title][:optional] }
       (1..@book.last_row).each do |index|
         row = @book.row(index).map { |cell| cell.to_s.strip }
-        return index if columns.keys.all? { |item| row.include?(item) }
+        return index if required_column_keys.all? { |item| row.include?(item) }
       end
       return nil
     end
