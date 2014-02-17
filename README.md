@@ -51,12 +51,17 @@ notified via some callbacks defined in the importer (see below).
 ## Documentation
 
 For mote detailed information about the different aspects of importing data
-with `active_importer`, refer to the following sections in the [wiki]():
+with `active_importer`, refer to the following sections in the [wiki]().
 
 [wiki]: https://github.com/continuum/active_importer/wiki
 
+### Getting started
+
 * [Understanding how spreadsheets are parsed](https://github.com/continuum/active_importer/wiki/Understanding-how-spreadsheets-are-parsed)
 * [Mapping columns to attributes](https://github.com/continuum/active_importer/wiki/Mapping-columns-to-attributes)
+
+### Diving in
+
 * [Custom data processing](https://github.com/continuum/active_importer/wiki/Custom-data-processing)
 * [Helper methods](https://github.com/continuum/active_importer/wiki/Helper-methods)
 * [File extension and supported formats](https://github.com/continuum/active_importer/wiki/File-extension-and-supported-formats)
@@ -65,12 +70,16 @@ with `active_importer`, refer to the following sections in the [wiki]():
 * [Selecting the model instance to import into (Update instead of create)](https://github.com/continuum/active_importer/wiki/Update-instead-of-create)
 * [Error handling](https://github.com/continuum/active_importer/wiki/Error-handling)
 * [Selecting the sheet to get data from](https://github.com/continuum/active_importer/wiki/Selecting-the-sheet-to-work-with)
-* [Advanced features](https://github.com/continuum/active_importer/wiki/Advanced-and-experimental-features)
+* [Skipping rows](https://github.com/continuum/active_importer/wiki/Skipping-rows)
+
+### Advanced features
+
+* [Aborting the import process](https://github.com/continuum/active_importer/wiki/Aborting-the-import-process)
+* [Transactional importers](https://github.com/continuum/active_importer/wiki/Transactional-importers)
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Contributions are welcome! Take a look at our [contributions guide][] for
+details.
+
+[contributions guide]: https://github.com/continuum/active_importer/wiki/Contributing
