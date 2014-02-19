@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Active Importer by continuum</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Active Importer</h1>
+        <h2>Define importers that load tabular data from spreadsheets or CSV files into any ActiveRecord-like ORM.</h2>
+        <a href="https://github.com/continuum/active_importer" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <p>Importers are classes that you can instruct on how to import data into data models.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">EmployeeImporter</span> <span class="o">&lt;</span> <span class="no">ActiveImporter</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">imports</span> <span class="no">Employee</span>
+
+  <span class="n">fetch_model</span> <span class="k">do</span>
+    <span class="no">Employee</span><span class="o">.</span><span class="n">where</span><span class="p">({</span>
+      <span class="n">first_name</span><span class="p">:</span> <span class="n">row</span><span class="o">[</span><span class="s1">'First name'</span><span class="o">]</span><span class="p">,</span>
+      <span class="n">last_name</span><span class="p">:</span> <span class="n">row</span><span class="o">[</span><span class="s1">'Last name'</span><span class="o">]</span><span class="p">,</span>
+    <span class="p">})</span><span class="o">.</span><span class="n">first_or_initialize</span>
+  <span class="k">end</span>
+
+  <span class="n">column</span> <span class="s1">'First name'</span><span class="p">,</span> <span class="ss">:first_name</span>
+
+  <span class="n">column</span> <span class="s1">'Last name'</span><span class="p">,</span> <span class="ss">:last_name</span>
+
+  <span class="n">column</span> <span class="s1">'Department'</span><span class="p">,</span> <span class="ss">:department</span> <span class="k">do</span> <span class="o">|</span><span class="n">department_name</span><span class="o">|</span>
+    <span class="no">Department</span><span class="o">.</span><span class="n">find_by</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="n">department_name</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">column</span> <span class="s1">'Salary'</span><span class="p">,</span> <span class="ss">:salary</span><span class="p">,</span> <span class="ss">optional</span><span class="p">:</span> <span class="kp">true</span>
+
+  <span class="n">on</span> <span class="ss">:row_error</span> <span class="k">do</span> <span class="o">|</span><span class="n">ex</span><span class="o">|</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Couldn't import row </span><span class="si">#{</span><span class="n">row_index</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">ex</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">on</span> <span class="ss">:row_processing</span> <span class="k">do</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">owner_id</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:owner_id</span><span class="o">]</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">logger</span>
+    <span class="vi">@logger</span> <span class="o">||=</span> <span class="no">Rails</span><span class="o">.</span><span class="n">logger</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Once defined, importers can be invoked to import a given data file.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="no">EmployeeImporter</span><span class="o">.</span><span class="n">import</span><span class="p">(</span><span class="s1">'file.xls'</span><span class="p">,</span> <span class="ss">params</span><span class="p">:</span> <span class="p">{</span> <span class="n">owner_id</span><span class="p">:</span> <span class="vi">@user</span><span class="o">.</span><span class="n">id</span> <span class="p">})</span>
+</pre></div>
+
+<h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>For mote detailed information about the different aspects of importing data with active_importer, refer to the following sections in the <a href="https://github.com/continuum/active_importer/wiki">wiki</a>.</p>
+
+<h3>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h3>
+
+<ul>
+<li><a href="https://github.com/continuum/active_importer/wiki/Understanding-how-spreadsheets-are-parsed">Understanding how spreadsheets are parsed</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Mapping-columns-to-attributes">Mapping columns to attributes</a></li>
+</ul><h3>
+<a name="diving-in" class="anchor" href="#diving-in"><span class="octicon octicon-link"></span></a>Diving in</h3>
+
+<ul>
+<li><a href="https://github.com/continuum/active_importer/wiki/Custom-data-processing">Custom data processing</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Helper-methods">Helper methods</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/File-extension-and-supported-formats">File extension and supported formats</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Custom-parameters">Passing custom parameters</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Callbacks">Events and callbacks</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Update-instead-of-create">Selecting the model instance to import into (Update instead of create)</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Error-handling">Error handling</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Selecting-the-sheet-to-work-with">Selecting the sheet to get data from</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Skipping-rows">Skipping rows</a></li>
+</ul><h3>
+<a name="advanced-features" class="anchor" href="#advanced-features"><span class="octicon octicon-link"></span></a>Advanced features</h3>
+
+<ul>
+<li><a href="https://github.com/continuum/active_importer/wiki/Aborting-the-import-process">Aborting the import process</a></li>
+<li><a href="https://github.com/continuum/active_importer/wiki/Transactional-importers">Transactional importers</a></li>
+</ul><h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>Contributions are welcome! Take a look at our <a href="https://github.com/continuum/active_importer/wiki/Contributing">contributions guide</a> for details.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/continuum/active_importer/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/continuum/active_importer/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/continuum/active_importer"></a> is maintained by <a href="https://github.com/continuum">continuum</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
