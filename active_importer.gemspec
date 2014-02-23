@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["gnapse@gmail.com"]
   spec.description   = %q{Import tabular data from spreadsheets or similar sources into data models}
   spec.summary       = %q{Import tabular data into data models}
-  spec.homepage      = ""
+  spec.homepage      = "http://continuum.github.io/active_importer/"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
