@@ -1,6 +1,10 @@
 class EmployeeBaseImporter < ActiveImporter::Base
   on(:import_finished) { base_import_finished }
 
+  skip_rows_if do
+    row['Name'] == 'BaseSkip'
+  end
+
   private
 
   def base_import_finished

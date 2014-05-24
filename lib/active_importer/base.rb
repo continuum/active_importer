@@ -243,9 +243,21 @@ module ActiveImporter
       self.class.columns
     end
 
+    def self.skip_row_blocks
+      @skip_row_blocks ||= begin
+                             klass = self
+                             result = []
+                             while klass < ActiveImporter::Base
+                               block = klass.skip_rows_block
+                               result << block if block
+                               klass = klass.superclass
+                             end
+                             result
+                           end
+    end
+
     def skip_row?
-      block = self.class.skip_rows_block
-      block && self.instance_exec(&block)
+      self.class.skip_row_blocks.any? { |block| self.instance_exec(&block) }
     end
 
     def load_sheet
