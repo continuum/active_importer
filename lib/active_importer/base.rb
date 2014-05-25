@@ -280,7 +280,7 @@ module ActiveImporter
     def load_header
       @header_index = find_header_index
       if @header_index
-        @header = @book.row(@header_index).map(&:strip)
+        @header = @book.row(@header_index).map(&:to_s).map(&:strip)
       else
         raise 'Spreadsheet does not contain all the expected columns'
       end
