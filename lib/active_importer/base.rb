@@ -54,7 +54,7 @@ module ActiveImporter
     end
 
     def self.column(title, field = nil, options = nil, &block)
-      title = title.strip
+      title = title.to_s.strip unless title.is_a?(Integer)
       if columns[title]
         raise "Duplicate importer column '#{title}'"
       end
@@ -269,7 +269,7 @@ module ActiveImporter
     end
 
     def find_header_index
-      required_column_keys = columns.keys.reject { |title| columns[title][:optional] }
+      required_column_keys = columns.keys.reject { |title| title.is_a?(Integer) || columns[title][:optional] }
       (1..@book.last_row).each do |index|
         row = @book.row(index).map { |cell| cell.to_s.strip }
         return index if required_column_keys.all? { |item| row.include?(item) }
@@ -281,6 +281,7 @@ module ActiveImporter
       @header_index = find_header_index
       if @header_index
         @header = @book.row(@header_index).map(&:to_s).map(&:strip)
+        @header.map!.with_index{|label, i| label.empty? ? i : label }
       else
         raise 'Spreadsheet does not contain all the expected columns'
       end
