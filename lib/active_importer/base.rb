@@ -290,7 +290,7 @@ module ActiveImporter
       begin
         @model = fetch_model
         build_model
-        model.save! unless aborted?
+        save_model unless aborted?
       rescue => e
         @row_errors << { row_index: row_index, error_message: e.message }
         fire_event :row_error, e
@@ -301,6 +301,10 @@ module ActiveImporter
       true
     ensure
       fire_event :row_processed
+    end
+
+    def save_model
+      model.save! if model.new_record? || model.changed?
     end
 
     def build_model
