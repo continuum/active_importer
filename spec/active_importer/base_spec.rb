@@ -23,7 +23,7 @@ describe ActiveImporter::Base do
   let(:importer) { EmployeeImporter.new('/dummy/file') }
 
   before do
-    allow(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return { Spreadsheet.new(spreadsheet_data) }
+    allow(Roo::Spreadsheet).to receive(:open).at_least(:once).and_return Spreadsheet.new(spreadsheet_data)
     EmployeeImporter.instance_variable_set(:@fetch_model_block, nil)
     EmployeeImporter.instance_variable_set(:@sheet_index, nil)
     EmployeeImporter.transactional(false)
