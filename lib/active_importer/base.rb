@@ -322,7 +322,9 @@ module ActiveImporter
     def row_to_hash(row)
       hash = {}
       row.each_with_index do |value, index|
-        hash[@header[index]] = value
+        if columns[@header[index]]
+          hash[@header[index]] = value
+        end
       end
       hash
     end
