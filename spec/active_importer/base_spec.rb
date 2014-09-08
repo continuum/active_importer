@@ -169,6 +169,21 @@ describe ActiveImporter::Base do
     end
   end
 
+  context 'when header row is indented' do
+    let(:spreadsheet_data) do
+      [
+        ['', 'Name'    , 'Department', 'Birth Date', 'Manager'],
+        ['', 'John Doe', 'IT'        , '2013-10-25'           ],
+      ]
+    end
+
+    it 'ignores empty columns' do
+      expect(EmployeeImporter).to receive(:new).once.and_return(importer)
+      EmployeeImporter.import('/dummy/file')
+      expect(importer.row['']).to eq(nil)
+    end
+  end
+
   describe '.fetch_model' do
     it 'controls what model instance is loaded for each given row' do
       model = Employee.new
