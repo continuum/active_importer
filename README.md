@@ -51,9 +51,7 @@ notified via some callbacks defined in the importer (see below).
 ## Documentation
 
 For mote detailed information about the different aspects of importing data
-with `active_importer`, refer to the following sections in the [wiki]().
-
-[wiki]: https://github.com/continuum/active_importer/wiki
+with `active_importer`, refer to the following sections in the [wiki](https://github.com/continuum/active_importer/wiki).
 
 ### Getting started
 
