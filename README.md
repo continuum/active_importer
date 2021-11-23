@@ -1,6 +1,8 @@
 # ActiveImporter
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/continuum/active_importer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## ARCHIVED
+
 Define importers that load tabular data from spreadsheets or CSV files into any ActiveRecord-like ORM.
 
 ## Installation
